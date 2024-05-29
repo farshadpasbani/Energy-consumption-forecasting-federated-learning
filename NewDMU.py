@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime as dt
+import os
 
 # Load the data
 data_files = {
@@ -113,7 +114,7 @@ x_train, y_train = create_rnn_dataset(training_set, lookback)
 x_test, y_test = create_rnn_dataset(test_data, lookback)
 
 ts_model = create_model(input_shape=(1, lookback), output_shape=1)
-log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+log_dir = "logs/fit/" + dt.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 ts_model.fit(
@@ -160,6 +161,10 @@ for best_period in range(3, 365):
 residual_max.reset_index(drop=True, inplace=True)
 residual_max.plot()
 plt.show()
+# Ensure the directory exists
+os.makedirs(building_name, exist_ok=True)
+
+# Save the residuals to an Excel file
 pd.DataFrame(residual_max).to_excel(
     f"{building_name}/building.xlsx", sheet_name="Decomposition_Residuals"
 )
